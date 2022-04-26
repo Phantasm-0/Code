@@ -24,8 +24,7 @@ namespace Code
             var cancellationTokenSource = new CancellationTokenSource();
             var receiverOptions = new ReceiverOptions(){
                 AllowedUpdates = {}
-            };
-            await Castle.Start();          
+            };         
             bot.StartReceiving(Handlers.HandleUpdateAsync, Handlers.HandleErrorAsync, receiverOptions,cancellationTokenSource.Token);
             Console.ReadLine();
             cancellationTokenSource.Cancel();
