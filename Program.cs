@@ -20,7 +20,7 @@ namespace Code
         
             string token = "1125612607:AAG4o5Myw3TB8ZnYfBbnRMZ0AdW_YG1EVMQ";
             string worktoken = "5323850623:AAGmIQ03d9otOuQdP6z9mpsoU2ocu5yHuOc";
-            var bot = new TelegramBotClient(token);
+            var bot = new TelegramBotClient(worktoken);
             var cancellationTokenSource = new CancellationTokenSource();
             var receiverOptions = new ReceiverOptions(){
                 AllowedUpdates = {}
