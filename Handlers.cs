@@ -82,6 +82,7 @@ namespace Code{
                 return;
             }
             Regex fight = new Regex("/fight.*");
+            Regex metext = new("^🏅Me$");
             Regex proof = new Regex("🏛Class info");
             if(fight.IsMatch(message?.Text)){
                 MatchCollection matchCollection = fight.Matches(message?.Text);
@@ -92,6 +93,9 @@ namespace Code{
             if(proof.IsMatch(message.Text) && (message.ForwardFrom.Username == "ChatWarsBot" || message.ForwardFrom.Username == "ChatWarsEliteBot") && message.Chat.Type == ChatType.Private){
                 await HandleProfile(message);
                 }
+            if(metext.IsMatch(message.Text) && message.Chat.Type == ChatType.Private){
+                await SendProfile(botClient,message.Chat.Id,message.From.Id);
+            }
         }
         private static async Task HandleCommand(ITelegramBotClient botClient, Message message)
         {
@@ -99,10 +103,10 @@ namespace Code{
             User userBot = await botClient.GetMeAsync();
             Regex meCommand = new Regex("^/me$");
             Regex meCommandForChats = new($"^/me@{userBot.Username}");
+            Regex metext = new("^🏅Me$");
             Regex start = new("^/start$");
 
-
-            if(meCommand.IsMatch(text) || meCommandForChats.IsMatch(text) ){
+            if((meCommand.IsMatch(text) || meCommandForChats.IsMatch(text))){
                 await SendProfile(botClient,message.Chat.Id,message.From.Id);
             }
             if(start.IsMatch(text) && message.Chat.Type == ChatType.Private){
