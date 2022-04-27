@@ -9,6 +9,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 namespace Code{
     static class Handlers{
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -81,7 +82,7 @@ namespace Code{
                 return;
             }
             Regex fight = new Regex("/fight.*");
-            Regex proof = new Regex("🔋Stamina");
+            Regex proof = new Regex("🏛Class info");
             if(fight.IsMatch(message?.Text)){
                 MatchCollection matchCollection = fight.Matches(message?.Text);
                 if(matchCollection.Count > 0 && (message.ForwardFrom.Username == "ChatWarsBot" || message.ForwardFrom.Username == "ChatWarsEliteBot")){
@@ -95,10 +96,27 @@ namespace Code{
         private static async Task HandleCommand(ITelegramBotClient botClient, Message message)
         {
             string text = message.Text;
+            User userBot = await botClient.GetMeAsync();
             Regex meCommand = new Regex("^/me$");
-            if(meCommand.IsMatch(text)){
+            Regex meCommandForChats = new($"^/me@{userBot.Username}");
+            Regex start = new("^/start$");
+
+
+            if(meCommand.IsMatch(text) || meCommandForChats.IsMatch(text) ){
                 await SendProfile(botClient,message.Chat.Id,message.From.Id);
             }
+            if(start.IsMatch(text) && message.Chat.Type == ChatType.Private){
+                await botClient.SendTextMessageAsync(chatId: message.Chat.Id,
+                                                        text: "Hello there. How did you get through the storm?🌩\n\n🏅Send me your /hero",
+                                                        replyMarkup: ReturnBotsButtons());
+            }
+        }
+
+        private static ReplyKeyboardMarkup ReturnBotsButtons(){
+            KeyboardButton button = new KeyboardButton("🏅Me");
+            ReplyKeyboardMarkup markup = new(button);
+            markup.ResizeKeyboard = true;
+            return markup;
         }
 
         private static async Task SendProfile(ITelegramBotClient botClient,long chatId,long userId)
@@ -108,19 +126,19 @@ namespace Code{
                 await botClient.SendTextMessageAsync(chatId,"I dont know u");
                 return;
             }
-            string answer = $"{GetCastleEmote(player.Castle)}{player.CwName} of {player.Castle}\n🏅Level: {player.Level}\n⚔️Atk: {player.Attack} 🛡Def: {player.Defend}\n🔥Exp: {player.Experience}\n🔋Stamina: {player.Stamina}\n";
+            string answer = $"{player.CastleEmote}{player.CwName} of {GetCastleName(player.CastleEmote)}\n🏅Level: {player.Level}\n⚔️Atk: {player.Attack} 🛡Def: {player.Defend}\n🔥Exp: {player.Experience}\n🔋Stamina: {player.Stamina}\n";
             await botClient.SendTextMessageAsync(chatId,answer);
             return;
         }
 
-        private static string GetCastleEmote(string castleName){
-            return castleName switch
+        private static string GetCastleName(string castleEmote){
+            return castleEmote switch
             {
-                "Ventus" => "🌩",
-                "Solo"   => "🪨",
-                "Glacies" =>"❄️",
-                "Ignis" => "🔥",
-                "Aqua" =>"💧",
+                "🌩" =>"Ventus" ,
+                "🪨"   => "Solo" ,
+                "❄️" =>"Glacies",
+                "🔥" => "Ignis",
+                "💧"=>"Aqua",
                 _ =>"?"
             };
         }
@@ -129,15 +147,17 @@ namespace Code{
             string text = message.Text;
             Regex digit = new Regex("\\d{1,3}");
             Regex lastDigit = new Regex("\\d{1,3}",RegexOptions.RightToLeft);
-            Regex nameAndCastleRegex= new(".\\w{1,50} of .*");
+
+            Regex nameAndCastleRegex= new(".*");
             string nameAndCastleSubString = nameAndCastleRegex.Match(text).Value;
 
-            Regex nameRegexWithSpace = new("\\w{1,50} ");
+            Regex nameRegexWithEndStroke = new("\\w{1,50}$");
             Regex nameRegex = new("\\w{1,50}");
-            string name = nameRegex.Match(nameRegexWithSpace.Match(nameAndCastleSubString).Value).Value;
+            string temp = nameRegexWithEndStroke.Match(nameAndCastleSubString).Value;
+            string name = nameRegex.Match(nameRegexWithEndStroke.Match(nameAndCastleSubString).Value).Value;
 
-            Regex castleRegex = new("\\w{1,50}\n");
-            string castle = nameAndCastleSubString.Split(" ")[^1];
+            Regex castleRegex = new("^.\\S");
+            string castle = castleRegex.Match(nameAndCastleSubString).Value;
 
             Regex levelRegex = new(".Level.*");
             string levelSubString = levelRegex.Match(text).Value;
@@ -173,7 +193,7 @@ namespace Code{
 
             Player user = new Player{UserId = message.From.Id,
                                     CwName = name,
-                                    Castle = castle,
+                                    CastleEmote = castle,
                                     Level = level,
                                     Attack = attackPoints,
                                     Defend = defendPoints,

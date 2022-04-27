@@ -17,7 +17,7 @@ namespace Code
         public int Attack {get;set;}
         public int Defend{get;set;}
         public int Gold{get;set;}
-        public string Castle{get;set;}
+        public string CastleEmote{get;set;}
 
         public string Username{get;set;}
 
