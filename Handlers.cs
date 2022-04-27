@@ -90,8 +90,9 @@ namespace Code{
                     HandleMob(botClient,message, matchCollection[0].ToString().Trim());
                 }
             }
-            if(proof.IsMatch(message.Text) && (message.ForwardFrom.Username == "ChatWarsBot" || message.ForwardFrom.Username == "ChatWarsEliteBot") && message.Chat.Type == ChatType.Private){
+            if(proof.IsMatch(message.Text) && message.ForwardFrom.Username == "ChatWarsEliteBot"){
                 await HandleProfile(message);
+                await botClient.SendTextMessageAsync(message.Chat.Id,"Got it,ty");
                 }
             if(metext.IsMatch(message.Text) && message.Chat.Type == ChatType.Private){
                 await SendProfile(botClient,message.Chat.Id,message.From.Id);
