@@ -15,7 +15,7 @@ namespace Code{
     public class Mob {
         Message cwMessage;
         private string link;
-        private int TIME_FOR_TIMER = 300;  //5 * 60
+        private int TIME_FOR_TIMER = 180;  //180
         private InlineKeyboardMarkup inlineKeyboardMarkup;
 
         private LinkedList<User> helpers = new();
@@ -23,7 +23,7 @@ namespace Code{
         public List<long> chatsForSending = new();
         DateTime endTime;
 
-        private const int allowableDifference= 10;
+        private const int allowableDifference = 10;
 
         public Mob(Message message, string _link){
             link = _link;
@@ -42,7 +42,7 @@ namespace Code{
                                                         text:MessageText(GetTimeDelta()),
                                                         parseMode: ParseMode.Html,
                                                         replyMarkup: inlineKeyboardMarkup);
-            await Task.Delay(2000 * MobManager.mobs.Count +1);
+            await Task.Delay(3000 * MobManager.mobs.Count +1);
             await Updating(bot,chatId,myMessage.MessageId);
             return;
         }
@@ -73,7 +73,7 @@ namespace Code{
         _                             => exception.ToString()
                     };
                     System.Console.WriteLine(ErrorMessage);
-                    await Task.Delay(2000* MobManager.mobs.Count + 1);
+                    await Task.Delay(3000* MobManager.mobs.Count + 1);
                 }
             }
             Clear(bot,chatId,listForClear);
@@ -92,7 +92,7 @@ namespace Code{
             foreach(var str in matchCollection){
                 stringBuilder.Append(str.ToString());
             }
-            stringBuilder.Append(string.Format("<b>⏰: {0:d2}:{1:d2}\n\n👑 Хокаге по вызову:{2}</b>\n",(int)time /60,(int)time % 60,GetHelpers()));
+            stringBuilder.Append(string.Format("<b>⏰: {0:d2}:{1:d2}\n\n🌪 Windwalkers:{2}</b>\n",(int)time /60,(int)time % 60,GetHelpers()));
             return stringBuilder.ToString();;
         }
         private InlineKeyboardMarkup CreateInlineKeyboardMarkup(){
@@ -113,7 +113,7 @@ namespace Code{
             int counter = 0;
             foreach(User helper in helpers){
                 counter++;
-                stringBuilder.Append($"\n<b>{counter}.</b>{helper?.FirstName} (@{helper?.Username})");
+                stringBuilder.Append($"\n<b>{counter})</b>{helper?.FirstName} (@{helper?.Username})");
             };
             return stringBuilder.ToString();
         }
