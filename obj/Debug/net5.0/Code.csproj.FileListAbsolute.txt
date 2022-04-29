@@ -29,3 +29,5 @@ C:\Users\Виталик\Documents\Code\bin\Debug\net5.0\Nito.Collections.Deque.d
 C:\Users\Виталик\Documents\Code\bin\Debug\net5.0\Nito.Disposables.dll
 C:\Users\Виталик\Documents\Code\obj\Debug\net5.0\Code.csproj.AssemblyReference.cache
 C:\Users\Виталик\Documents\Code\obj\Debug\net5.0\refint\Code.dll
+C:\Users\Виталик\Documents\Code\bin\Debug\net5.0\Npgsql.dll
+C:\Users\Виталик\Documents\Code\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
