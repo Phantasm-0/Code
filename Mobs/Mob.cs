@@ -135,9 +135,9 @@ namespace Code{
             }
             int counter = 0;
             StringBuilder stringBuilder = new();
-            foreach(Player player in players){
-                if(Math.Abs(player.Level - averageMobLvl) < allowableDifference){
-                    stringBuilder.Append($"@{player.Username ?? string.Empty}");
+            for(int i = 0; i< players.Count;i++){
+                if(Math.Abs(players[i].Level - averageMobLvl) < allowableDifference){
+                    stringBuilder.Append($"@{players[i].Username ?? string.Empty} ");
                 }
                 counter++;
                 if(counter>= 5){
