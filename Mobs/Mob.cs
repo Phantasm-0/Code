@@ -13,17 +13,17 @@ using System.Collections.Concurrent;
 namespace Code{
 
     public class Mob {
-        Message cwMessage;
-        private string link;
-        private int TIME_FOR_TIMER = 180;  //180
-        private InlineKeyboardMarkup inlineKeyboardMarkup;
+        protected Message cwMessage;
+        protected string link;
+        protected int TIME_FOR_TIMER = 180;  //180
+        protected InlineKeyboardMarkup inlineKeyboardMarkup;
 
-        private LinkedList<User> helpers = new();
-        private int averageMobLvl;
+        protected LinkedList<User> helpers = new();
+        protected int averageMobLvl;
         public List<long> chatsForSending = new();
-        DateTime endTime;
+        protected DateTime endTime;
 
-        private const int allowableDifference = 10;
+        protected const int allowableDifference = 10;
 
         public Mob(Message message, string _link){
             link = _link;
@@ -37,6 +37,11 @@ namespace Code{
         }
 
         public async Task Start(ITelegramBotClient bot,long chatId){ 
+            if( GetTimeDelta() < 0){
+                await bot.SendTextMessageAsync(chatId,"Its over");
+                return;
+
+            }
             chatsForSending.Add(chatId); 
             Message myMessage = await bot.SendTextMessageAsync(chatId: chatId, 
                                                         text:MessageText(GetTimeDelta()),
@@ -54,7 +59,7 @@ namespace Code{
                     listForClear.Add(temp);
                 }
             }
-            while((GetTimeDelta())> 0){
+            while(GetTimeDelta() > 0){
                 try
                 {
                     Message myMessage = await bot.EditMessageTextAsync(chatId,messageId,
@@ -72,8 +77,10 @@ namespace Code{
                                     => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
         _                             => exception.ToString()
                     };
-                    System.Console.WriteLine(ErrorMessage);
-                    await Task.Delay(3000* MobManager.mobs.Count + 1);
+                    if(exception is ApiRequestException apiRequestException1){
+                        await Task.Delay(1000 * (int)apiRequestException1.Parameters.RetryAfter);
+                        System.Console.WriteLine(ErrorMessage);
+                    }
                 }
             }
             Clear(bot,chatId,listForClear);
@@ -95,7 +102,7 @@ namespace Code{
             stringBuilder.Append(string.Format("<b>⏰: {0:d2}:{1:d2}\n\n🌪 Windwalkers:{2}</b>\n",(int)time /60,(int)time % 60,GetHelpers()));
             return stringBuilder.ToString();;
         }
-        private InlineKeyboardMarkup CreateInlineKeyboardMarkup(){
+        protected InlineKeyboardMarkup CreateInlineKeyboardMarkup(){
             InlineKeyboardButton linkButton = new InlineKeyboardButton("⚔️ Fight");
             linkButton.Url ="https://t.me/share/url?url=" + link;
             InlineKeyboardButton helpButton = InlineKeyboardButton.WithCallbackData("🤝 Helping",link);
@@ -135,11 +142,13 @@ namespace Code{
             }
             int counter = 0;
             StringBuilder stringBuilder = new();
+            Squad squad = await Castle.GetSquadByChatID(chatId);
+            if(squad != null){
             for(int i = 0; i< players.Count;i++){
-                if(Math.Abs(players[i].Level - averageMobLvl) < allowableDifference){
+                if(Math.Abs(players[i].Level - averageMobLvl) < allowableDifference ){
                     stringBuilder.Append($"@{players[i].Username ?? string.Empty} ");
+                    counter++;
                 }
-                counter++;
                 if(counter>= 5){
                     Message message = await bot.SendTextMessageAsync(chatId,stringBuilder.ToString());
                     messagesForDelete.Add(message.MessageId);
@@ -151,9 +160,17 @@ namespace Code{
                 Message finalMessage = await bot.SendTextMessageAsync(chatId,stringBuilder.ToString());
                 messagesForDelete.Add(finalMessage.MessageId);
             }
+            }
             return messagesForDelete;
         }
-        int CalculateAverangeMobLevel(){
+        private async Task<bool> IsPinged(Player player,long squadID){
+
+            return ((Math.Abs(player.Level - averageMobLvl) < allowableDifference) 
+                    && (player.UserId != cwMessage.From.Id)
+                    && player.SquadID == squadID
+                    && (player.PingSettings == Pings.OnAll || player.PingSettings == Pings.OnAnyMobs));
+        }
+        protected int CalculateAverangeMobLevel(){
             Regex spliter = new Regex(".*\n");
             Regex digitRegex = new Regex("\\d{1,2}");
             Regex mobsCountRegex = new Regex("\\d{1,2} x");

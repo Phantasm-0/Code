@@ -1,5 +1,6 @@
 
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -9,7 +10,14 @@ public static class MobManager{
     public static ConcurrentDictionary<string,Mob> mobs = new ConcurrentDictionary<string, Mob>();
 
     async public static Task AddAndStart(ITelegramBotClient botClient, Message message, string link) {
-            Mob mob = new(message, link);
+            Mob mob;
+            Regex ambushRegex = new("It's an ambush!");
+            if(ambushRegex.IsMatch(message.Text)){
+                mob = new Ambush(message,link);
+            }
+            else{
+                mob = new (message, link);
+            }
             if(mobs.ContainsKey(link)){
                 mobs.TryGetValue(link,out mob);
                 if(!mob.chatsForSending.Contains(message.Chat.Id)){
@@ -28,13 +36,13 @@ public static class MobManager{
             if(mob.UpdateHelpers(callbackQuery.From)){
                 await bot.AnswerCallbackQueryAsync(
                         callbackQueryId: callbackQuery.Id,
-                        text: $"Вы вступили в бой");
+                        text: $"You joined the fight");
             }
             else
             {
                 await bot.AnswerCallbackQueryAsync(
                         callbackQueryId: callbackQuery.Id,
-                        text: $"Клонирование запрещено");
+                        text: $"Cloning is taboo");
             }
     }
 

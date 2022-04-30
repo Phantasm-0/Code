@@ -92,7 +92,7 @@ namespace Code{
             }
             if(proof.IsMatch(message.Text) && message.ForwardFrom.Username == "ChatWarsEliteBot"){
                 await HandleProfile(message);
-                await botClient.SendTextMessageAsync(message.Chat.Id,"Got it,ty");
+                await botClient.SendTextMessageAsync(message.Chat.Id,"Got it, ty");
                 }
             if(metext.IsMatch(message.Text) && message.Chat.Type == ChatType.Private){
                 await SendProfile(botClient,message.Chat.Id,message.From.Id);
@@ -157,7 +157,7 @@ namespace Code{
             string nameAndCastleSubString = nameAndCastleRegex.Match(text).Value;
 
             Regex nameRegexWithEndStroke = new("\\w{1,50}$");
-            Regex nameRegex = new("\\w{1,50}");
+            Regex nameRegex = new("\\w{1,50}$");
             string temp = nameRegexWithEndStroke.Match(nameAndCastleSubString).Value;
             string name = nameRegex.Match(nameRegexWithEndStroke.Match(nameAndCastleSubString).Value).Value;
 
