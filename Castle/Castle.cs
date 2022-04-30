@@ -13,9 +13,10 @@ namespace Code
         static private ConcurrentDictionary<string,SemaphoreSlim> playersLocks = new ();
         static private ConcurrentDictionary<string,SemaphoreSlim> squadLocks = new();
         static private ConcurrentDictionary<string, SemaphoreSlim> guildsLocks = new();
-        private static List<string> playersPathes = new();
         private static List<string> guildsPathes = new();
         private static List<string> squadesPathes = new();
+
+        static private ConcurrentDictionary<string,SemaphoreSlim> getPlayersLock = new ();
         private static List<Guild> guilds = new();
         private static List<Squad> squads = new();
         private static string guildDirectoryPath = "./Castle/Guilds";
@@ -100,7 +101,11 @@ namespace Code
         public static async Task<List<Player>> GetPlayers(){
             DirectoryInfo info = Directory.CreateDirectory(playersDirectoryPath);
             FileInfo[] fileInfos = info.GetFiles();
+            var semaphoreSlimGPL = getPlayersLock.GetOrAdd("Get", new SemaphoreSlim(1, 1));
+            await semaphoreSlimGPL.WaitAsync();
+            try{
             if(fileInfos.Length > 0){
+                List<string> playersPathes = new();
                 foreach(var file in fileInfos){
                    playersPathes.Add(file.Name);
                 }
@@ -121,6 +126,13 @@ namespace Code
                     }
                 }
                 return players;
+            }
+            }
+            catch(Exception exception){
+                Console.WriteLine($"{exception.Message}");
+            }
+            finally{
+                semaphoreSlimGPL.Release();
             }
             return null;
         }
