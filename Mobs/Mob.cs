@@ -142,7 +142,7 @@ namespace Code{
             }
             int counter = 0;
             StringBuilder stringBuilder = new();
-            Squad squad = await Castle.GetSquadByChatID(chatId);
+            //Squad squad = await Castle.GetSquadByChatID(chatId);
             if(squad != null){
             for(int i = 0; i< players.Count;i++){
                 if(Math.Abs(players[i].Level - averageMobLvl) < allowableDifference ){
@@ -163,13 +163,13 @@ namespace Code{
             }
             return messagesForDelete;
         }
-        private async Task<bool> IsPinged(Player player,long squadID){
+       /* private async Task<bool> IsPinged(Player player,long squadID){
 
             return ((Math.Abs(player.Level - averageMobLvl) < allowableDifference) 
                     && (player.UserId != cwMessage.From.Id)
                     && player.SquadID == squadID
                     && (player.PingSettings == Pings.OnAll || player.PingSettings == Pings.OnAnyMobs));
-        }
+        }*/
         protected int CalculateAverangeMobLevel(){
             Regex spliter = new Regex(".*\n");
             Regex digitRegex = new Regex("\\d{1,2}");
