@@ -143,7 +143,7 @@ namespace Code{
             int counter = 0;
             StringBuilder stringBuilder = new();
             //Squad squad = await Castle.GetSquadByChatID(chatId);
-            if(squad != null){
+            //if(squad != null){
             for(int i = 0; i< players.Count;i++){
                 if(Math.Abs(players[i].Level - averageMobLvl) < allowableDifference ){
                     stringBuilder.Append($"@{players[i].Username ?? string.Empty} ");
@@ -160,7 +160,7 @@ namespace Code{
                 Message finalMessage = await bot.SendTextMessageAsync(chatId,stringBuilder.ToString());
                 messagesForDelete.Add(finalMessage.MessageId);
             }
-            }
+            //}
             return messagesForDelete;
         }
        /* private async Task<bool> IsPinged(Player player,long squadID){
